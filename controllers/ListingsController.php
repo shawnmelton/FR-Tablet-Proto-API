@@ -1,7 +1,7 @@
 <?php
 class ListingsController {
     private function buildParams() {
-        $params = array('fl' => $this->getFL(), 'supplier_id' => 223, 'pagesize' => 50);
+        $params = array('fl' => $this->getFL(), 'supplier_id' => 223, 'pagesize' => 200);
         foreach($_GET as $param => $value) {
             switch($param) {
                 case 'city': $params['location.city'] = $value; break;
