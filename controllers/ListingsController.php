@@ -1,7 +1,7 @@
 <?php
 class ListingsController {
     private function buildParams() {
-        $params = array('fl' => $this->getFL());
+        $params = array('fl' => $this->getFL(), 'supplier_id' => 223, 'pagesize' => 50);
         foreach($_GET as $param => $value) {
             switch($param) {
                 case 'city': $params['location.city'] = $value; break;
@@ -16,7 +16,7 @@ class ListingsController {
                     break;
 
                 case 'homesId': $params['id'] = $value; break;
-                case 'limit': $params['pagesize'] = intval($value); break;
+                //case 'limit': $params['pagesize'] = intval($value); break;
             }
         }
 
@@ -45,11 +45,13 @@ class ListingsController {
             }
         }
 
+        $this->paginate($obj);
+
         return json_encode($obj);
     }
 
     private function getFields() {
-        return array(
+        $fields = array(
             'propid' => 'homesId',
             'mls_number' => 'id',
             'lat' => 'lat',
@@ -64,6 +66,12 @@ class ListingsController {
             'main_image' => 'primaryImage',
             'address' => 'streetAddress'
         );
+
+        if(isset($_GET['fields'])) {
+            $fields = array_intersect($fields, explode(',', $_GET['fields']));
+        }
+
+        return $fields;
     }
 
     private function getFL() {
@@ -83,5 +91,14 @@ class ListingsController {
         header('Content-Type: application/json');
         echo $response;
         exit;
+    }
+
+    private function paginate($obj) {
+        if(isset($_GET['limit']) && preg_match('/^\d+$/', $_GET['limit'])) {
+            $start = (isset($_GET['start']) && preg_match('/^\d+$/', $_GET['start'])) ? $_GET['start'] : 0;
+            $obj->listings = array_slice($obj->listings, $start, $_GET['limit']);
+        }
+
+        return $obj;
     }
 }
