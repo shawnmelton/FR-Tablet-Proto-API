@@ -36,13 +36,21 @@ class ListingsController {
                 if($homesName != $properName && isset($listing->$homesName)) {
                     if($homesName == 'subdivision') {
                         $obj->listings[$index]->$homesName = ucwords(strtolower($listing->subdivision));
+                    } else if($homesName == 'mobile_type') {
+                        $value = '';
+                        switch(strtolower($obj->listings[$index]->$homesName)) {
+                            case 'moblsel': $value = 'Select'; break;
+                            case 'moblexcl': $value = 'Exclusive'; break;
+                        }
+                        
+                        $obj->listings[$index]->$homesName = $value;
                     }
 
                     $obj->listings[$index]->$properName = $obj->listings[$index]->$homesName;
 
                     unset($obj->listings[$index]->$homesName);
-                } else if($properName == 'video') { // Field doesn't show up if apartment doesn't have video
-                    $obj->listings[$index]->video = '';
+                } else if($properName == 'video' || $properName == 'product') { // Field doesn't show up if apartment doesn't have video
+                    $obj->listings[$index]->$properName = '';
                 }
             }
         }
@@ -68,7 +76,8 @@ class ListingsController {
             'main_image' => 'primaryImage',
             'address' => 'streetAddress',
             'caption' => 'description',
-            'property_video_url' => 'video'
+            'property_video_url' => 'video',
+            'mobile_type' => 'product'
         );
 
         if(isset($_GET['fields'])) {
