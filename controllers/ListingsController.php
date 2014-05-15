@@ -41,6 +41,8 @@ class ListingsController {
                     $obj->listings[$index]->$properName = $obj->listings[$index]->$homesName;
 
                     unset($obj->listings[$index]->$homesName);
+                } else if($properName == 'video') { // Field doesn't show up if apartment doesn't have video
+                    $obj->listings[$index]->video = '';
                 }
             }
         }
@@ -64,7 +66,9 @@ class ListingsController {
             'beds' => 'beds',
             'images' => 'images',
             'main_image' => 'primaryImage',
-            'address' => 'streetAddress'
+            'address' => 'streetAddress',
+            'caption' => 'description',
+            'property_video_url' => 'video'
         );
 
         if(isset($_GET['fields'])) {
