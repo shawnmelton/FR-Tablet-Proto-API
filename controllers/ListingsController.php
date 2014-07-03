@@ -27,7 +27,20 @@ class ListingsController {
                     break;
 
                 case 'homesId': $params['id'] = $value; break;
-                //case 'limit': $params['pagesize'] = intval($value); break;
+                case 'latMax' : {
+                    $lat = new stdClass();
+                    $lat->min = $_GET['latMin'];
+                    $lat->max = $_GET['latMax'];
+                    $params['lat'] = $lat; 
+                    break;
+                }
+                case 'lngMax' : {
+                    $lng = new stdClass();
+                    $lng->min = $_GET['lngMin'];
+                    $lng->max = $_GET['lngMax'];
+                    $params['lng'] = $lng; 
+                    break;
+                }
             }
         }
 
@@ -123,7 +136,7 @@ class ListingsController {
     }
 
     public function api() {
-        $response = APIRequest::send('listings/search', $this->buildParams());
+        $response = APIRequest::sendPost('listings/search', $this->buildParams());
         $response = $this->cleanResponse($response);
 
         header('Content-Type: application/json');

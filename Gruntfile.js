@@ -17,7 +17,6 @@ module.exports = (function(grunt) {
             '/Users/danielburke/Documents/Development/DE/Sites/Forrent/FR-Tablet-Proto-API/**/Gruntfile.js',
             '/Users/danielburke/Documents/Development/DE/Sites/Forrent/FR-Tablet-Proto-API/**/package.json',
             '/Users/danielburke/Documents/Development/DE/Sites/Forrent/FR-Tablet-Proto-API/node_modules',
-            '/Users/danielburke/Documents/Development/DE/Sites/Forrent/FR-Tablet-Proto-API/tools',
             '/Users/danielburke/Documents/Development/DE/Sites/Forrent/FR-Tablet-Proto-API/site',
             '/Users/danielburke/Documents/Development/DE/Sites/Forrent/FR-Tablet-Proto-API/.git']
           }
