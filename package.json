@@ -1,0 +1,16 @@
+{
+  "name": "ForRentListingsAPI",
+  "version": "0.0.0",
+  "description": "API to support ForRent clients",
+  "main": "index.php",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Daniel Burke",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-ftp-deploy": "^0.1.2"
+  }
+}

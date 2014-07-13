@@ -1,9 +1,20 @@
 <?php
 class ListingsController {
+    
+    private $excluded_properties = array();
+
     private function buildParams() {
         $params = array('fl' => $this->getFL(), 'supplier_id' => 223, 'pagesize' => 200);
         foreach($_GET as $param => $value) {
             switch($param) {
+
+                //Allow us to filter out whichever properties we don't want
+                //to come back in the search results
+                case 'exclude': {
+                    $exclusions = explode(',', $value);
+                    $this->excluded_properties = $exclusions;
+                    break;
+                }
                 case 'city': $params['location.city'] = $value; break;
                 case 'state': $params['location.state'] = $value; break;
                 case 'zip': $params['location.zip'] = $value; break;
@@ -16,7 +27,20 @@ class ListingsController {
                     break;
 
                 case 'homesId': $params['id'] = $value; break;
-                //case 'limit': $params['pagesize'] = intval($value); break;
+                case 'latMax' : {
+                    $lat = new stdClass();
+                    $lat->min = $_GET['latMin'];
+                    $lat->max = $_GET['latMax'];
+                    $params['lat'] = $lat; 
+                    break;
+                }
+                case 'lngMax' : {
+                    $lng = new stdClass();
+                    $lng->min = $_GET['lngMin'];
+                    $lng->max = $_GET['lngMax'];
+                    $params['lng'] = $lng; 
+                    break;
+                }
             }
         }
 
@@ -32,15 +56,25 @@ class ListingsController {
                 unset($obj->listings[$index]->links);
             }
 
+            //Filter out whichever properties we don't want
+            //to come back in the search results
+            if(in_array($obj->listings[$index]->propid, $this->excluded_properties)){
+                unset($obj->listings[$index]);
+                continue;
+            }
+
             foreach($fields as $homesName => $properName) {
                 if($homesName != $properName && isset($listing->$homesName)) {
                     if($homesName == 'subdivision') {
                         $obj->listings[$index]->$homesName = ucwords(strtolower($listing->subdivision));
+                    } else if($homesName == 'features_bullets') {
+                        $obj->listings[$index]->$homesName = $obj->listings[$index]->$homesName->Bullet;
                     } else if($homesName == 'mobile_type') {
                         $value = '';
                         switch(strtolower($obj->listings[$index]->$homesName)) {
                             case 'moblsel': $value = 'Select'; break;
                             case 'moblexcl': $value = 'Exclusive'; break;
+                            default: $value = strtolower($obj->listings[$index]->$homesName); break;
                         }
                         
                         $obj->listings[$index]->$homesName = $value;
@@ -50,7 +84,8 @@ class ListingsController {
 
                     unset($obj->listings[$index]->$homesName);
                 } else if($properName == 'video' || $properName == 'product') { // Field doesn't show up if apartment doesn't have video
-                    $obj->listings[$index]->$properName = '';
+                    // $obj->listings[$index]->$properName = '';
+                    unset($obj->listings[$index]->$properName);
                 }
             }
         }
@@ -77,7 +112,10 @@ class ListingsController {
             'address' => 'streetAddress',
             'caption' => 'description',
             'property_video_url' => 'video',
-            'mobile_type' => 'product'
+            'mobile_type' => 'product',
+            'detail_attributes' => 'management_info',
+            'pet_policy' => 'pet_policy',
+            'features_bullets' => 'features'
         );
 
         if(isset($_GET['fields'])) {
@@ -98,7 +136,7 @@ class ListingsController {
     }
 
     public function api() {
-        $response = APIRequest::send('listings/search', $this->buildParams());
+        $response = APIRequest::sendPost('listings/search', $this->buildParams());
         $response = $this->cleanResponse($response);
 
         header('Content-Type: application/json');
